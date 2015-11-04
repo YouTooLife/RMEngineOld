@@ -8,8 +8,11 @@ import net.youtoolife.tools.RMEBuilder;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 1330;
-		config.height = 764;
+		//config.width = 1330;
+		//config.height = 764;
+		config.width = 1280;
+		config.height = 768;
+		//config.fullscreen = true;
 		new LwjglApplication(new RMEBuilder(), config);
 	}
 }

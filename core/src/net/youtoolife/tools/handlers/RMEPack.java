@@ -7,7 +7,6 @@ import net.youtoolife.tools.models.Player;
 import net.youtoolife.tools.models.SurfaceX;
 import net.youtoolife.tools.models.Wall;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
@@ -54,6 +53,18 @@ public class RMEPack implements Json.Serializable {
 			for (Wall sur:walls)
 				if (sur.getBoundingRectangle().contains(x+128/2, y+128/2))
 					walls.removeValue(sur, false);
+		if (doors != null)
+			for (Door sur:doors)
+				if (sur.getBoundingRectangle().contains(x+128/2, y+128/2))
+					doors.removeValue(sur, false);
+		if (objects != null)
+			for (ObjectX sur:objects)
+				if (sur.getBoundingRectangle().contains(x+128/2, y+128/2))
+					objects.removeValue(sur, false);
+		if (checkPoints != null)
+			for (CheckPoint sur:checkPoints)
+				if (sur.getBoundingRectangle().contains(x+128/2, y+128/2))
+					checkPoints.removeValue(sur, false);
 		
 		
 	}
@@ -68,6 +79,24 @@ public class RMEPack implements Json.Serializable {
 		if (getWalls() == null)
 			setWalls(new Array<Wall>());
 		getWalls().add(wall);
+	}
+	
+	public void addDoor(Door door) {
+		if (getDoors() == null)
+			setDoors(new Array<Door>());
+		getDoors().add(door);
+	}
+	
+	public void addCheckPoint(CheckPoint checkPoint) {
+		if (getCheckPoints() == null)
+			setCheckPoints(new Array<CheckPoint>());
+		getCheckPoints().add(checkPoint);
+	}
+	
+	public void addObject(ObjectX object) {
+		if (getObjects() == null)
+			setObjects(new Array<ObjectX>());
+		getObjects().add(object);
 	}
 
 
@@ -99,6 +128,16 @@ public class RMEPack implements Json.Serializable {
 		if (getWalls() != null)
 			for (Wall sur:getWalls())
 				sur.update(delta);
+		if (getDoors() != null)
+			for (Door sur:getDoors())
+				sur.update(delta);
+		if (getObjects() != null)
+			for (ObjectX sur:getObjects())
+				sur.update(delta);
+		if (getCheckPoints() != null)
+			for (CheckPoint sur:getCheckPoints())
+				sur.update(delta);
+		
 		if (player != null)
 			if (isGame())
 			player.update(delta);
@@ -111,6 +150,18 @@ public class RMEPack implements Json.Serializable {
 			sur.draw(batcher);
 		if (walls != null)
 			for (Wall sur:walls)
+				if (!sur.isDraw())
+				sur.draw(batcher);
+		if (doors != null)
+			for (Door sur:doors)
+				if (!sur.isDraw())
+				sur.draw(batcher);
+		if (objects != null)
+			for (ObjectX sur:objects)
+				if (!sur.isDraw())
+				sur.draw(batcher);
+		if (checkPoints != null)
+			for (CheckPoint sur:checkPoints)
 				if (!sur.isDraw())
 				sur.draw(batcher);
 
@@ -135,6 +186,30 @@ public class RMEPack implements Json.Serializable {
 				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
 				}
 			}
+		if (getDoors() != null)
+			for (Door sur:getDoors())
+			{
+				if (sur.isDraw()) {
+					shapeRenderer.setColor(sur.getColor());
+				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
+				}
+			}
+		if (getObjects() != null)
+			for (ObjectX sur:getObjects())
+			{
+				if (sur.isDraw()) {
+					shapeRenderer.setColor(sur.getColor());
+				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
+				}
+			}
+		if (getCheckPoints() != null)
+			for (CheckPoint sur:getCheckPoints())
+			{
+				if (sur.isDraw()) {
+					shapeRenderer.setColor(sur.getColor());
+				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
+				}
+			}
 	}
 	
 	public void drawShapeLine(ShapeRenderer shapeRenderer) {
@@ -153,14 +228,61 @@ public class RMEPack implements Json.Serializable {
 				if (sur.isRect())
 				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
 			}
+		if (getDoors() != null)
+			for (Door sur:getDoors())
+			{
+				//shapeRenderer.setColor(sur.getColor());
+				if (sur.isRect())
+				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
+			}
+		if (getObjects() != null)
+			for (ObjectX sur:getObjects())
+			{
+				//shapeRenderer.setColor(sur.getColor());
+				if (sur.isRect())
+				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
+			}
+		if (getCheckPoints() != null)
+			for (CheckPoint sur:getCheckPoints())
+			{
+				//shapeRenderer.setColor(sur.getColor());
+				if (sur.isRect())
+				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
+			}
 	}
 
 	public Array<Wall> getWalls() {
 		return walls;
 	}
+	
+	public Array<Door> getDoors() {
+		return doors;
+	}
+	
+	public Array<ObjectX> getObjects() {
+		return objects;
+	}
+	public Array<CheckPoint> getCheckPoints() {
+		return checkPoints;
+	}
+	
+	public Array<SurfaceX> getSurface() {
+		return surface;
+	}
 
 	public void setWalls(Array<Wall> walls) {
 		this.walls = walls;
+	}
+	
+	public void setDoors(Array<Door> doors) {
+		this.doors = doors;
+	}
+	
+	public void setObjects(Array<ObjectX> objects) {
+		this.objects = objects;
+	}
+	public void setCheckPoints(Array<CheckPoint> checkPoins) {
+		this.checkPoints = checkPoins;
 	}
 
 	public boolean isGame() {

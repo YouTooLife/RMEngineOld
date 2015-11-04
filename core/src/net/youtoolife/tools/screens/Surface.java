@@ -4,6 +4,9 @@ import net.youtoolife.tools.Assets;
 import net.youtoolife.tools.RMEBuilder;
 import net.youtoolife.tools.handlers.RMECrypt;
 import net.youtoolife.tools.handlers.RMEPack;
+import net.youtoolife.tools.models.CheckPoint;
+import net.youtoolife.tools.models.Door;
+import net.youtoolife.tools.models.ObjectX;
 import net.youtoolife.tools.models.Player;
 import net.youtoolife.tools.models.SurfaceX;
 import net.youtoolife.tools.models.Wall;
@@ -186,6 +189,14 @@ public class Surface extends ScreenAdapter {
 			
 			@Override
 			public boolean keyUp(int keycode) {
+				
+				////
+				if (keycode == Keys.R) {
+					if (pack.isGame() && pack.getPlayer() != null)
+					pack.getPlayer().goToCheckPoint();
+				}
+				///
+				
 				if (keycode == Keys.G) {
 					if (!debug)
 						debug = true;
@@ -241,12 +252,12 @@ public class Surface extends ScreenAdapter {
 						public void input(String text) {
 							Json json = new Json();
 							json.toJson(pack, new FileHandle(text+".jMap"));
-							/*
+							
 							RMECrypt crypt = new RMECrypt();
 							String s = json.toJson(pack);
 							FileHandle filehandle = Gdx.files.local(text+".levelc");
 							filehandle.writeBytes(crypt.encrypt(s, "YouTooLife1911"), false);
-							*/
+							
 							
 						}
 						
@@ -366,10 +377,26 @@ public class Surface extends ScreenAdapter {
 					//	if (!drawShape)
 						pack.addWall(new Wall(Assets.getTexture(currentType+"/"+currentImg),
 								rect.getX()+128*i, rect.getY()+128*j, drawShape, drawRect));
+					}
+					if (currentType.equalsIgnoreCase("Door")) {
+							//	if (!drawShape)
+								pack.addDoor(new Door(Assets.getTexture(currentType+"/"+currentImg), 
+										rect.getX()+128*i, rect.getY()+128*j, drawShape, drawRect));
+					}
+					if (currentType.equalsIgnoreCase("Object")) {
+									//	if (!drawShape)
+						pack.addObject(new ObjectX(Assets.getTexture(currentType+"/"+currentImg), 
+									rect.getX()+128*i, rect.getY()+128*j));
+					}
+						if (currentType.equalsIgnoreCase("CheckPoint")) {
+							//	if (!drawShape)
+								pack.addCheckPoint(new CheckPoint(Assets.getTexture(currentType+"/"+currentImg), 
+										rect.getX()+128*i, rect.getY()+128*j, drawShape, drawRect));
 					//else
 					//	pack.addWall(new Wall(
 					//			rect.getX()+128*i, rect.getY()+128*j, drawRect));
 					}
+						
 					if (currentType.equalsIgnoreCase("Player")) 
 						pack.setPlayer(new Player(Assets.getTexture(currentType+"/"+currentImg), rect.getX()+128*i, rect.getY()+128*j));
 				

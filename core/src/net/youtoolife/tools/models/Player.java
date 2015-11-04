@@ -1,6 +1,7 @@
 package net.youtoolife.tools.models;
 
 
+import net.youtoolife.tools.handlers.RMEPack;
 import net.youtoolife.tools.handlers.RMESprite;
 import net.youtoolife.tools.screens.Surface;
 
@@ -9,6 +10,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -21,10 +23,14 @@ public class Player extends RMESprite implements Json.Serializable {
 	 public Rectangle bounds;
 	 public float rot = 0;
 	 
-	 public Color color = new Color(1.f, 1.f, 1.f, 0.f);
+	 public Color color = new Color(1.f, 0.f, 0.f, 1.f);
 	 
 	 private int hp = 100;
 	 private float sX, sY;
+	 private Vector2 checkPoint = new Vector2();
+	 private int checkPointCharge = 3;
+	 
+	 private boolean fall = false;
 	 
 	 public Player() {
 		 super();
@@ -37,6 +43,8 @@ public class Player extends RMESprite implements Json.Serializable {
 		//bounds = new Circle(x, y, ws.getWidth());
 		//bounds = new Rectangle(x, y, ws.getWidth()/9f*7, ws.getHeight()/9f*7);
 		bounds = new Rectangle(x, y, 128/9f*7, 128/9f*7);
+		checkPoint.set(x, y);
+		//setColor(color);
 	}
 	
 	public Player(Texture ws, int frame_cols, int frame_rows, int animStart, int animStop, boolean animActive, float animSpeed) {
@@ -45,42 +53,126 @@ public class Player extends RMESprite implements Json.Serializable {
 		//bounds = new Rectangle(0, 0, ws.getWidth()/9f*7, ws.getHeight()/9f*7);
 	}
 	
+	public void fall(float delta) {
+		if (fall) {
+			setSize(getWidth()-300*delta, getHeight()-300*delta);
+			if (getWidth() < 10) 
+				goToCheckPoint();
+		}
+	}
+	
+	
+	public void goToCheckPoint() {
+		
+		if (checkPointCharge > 0) {
+			setPosition(checkPoint.x, checkPoint.y);
+			checkPointCharge--;
+		}
+		
+	}
+	
+	public void wallForce(RMESprite wall) {
+		speedX = 0;
+		speedY = 0;
+		int max = 20;
+		if (bounds.y+bounds.height <= (wall.getBoundingRectangle().y+max)) {
+			System.out.println("DOWN");
+			setPosition(getX(), getY()-(bounds.y+bounds.height-wall.getBoundingRectangle().y));
+		}
+		if (bounds.y >= (wall.getBoundingRectangle().y+wall.getBoundingRectangle().height-max)) {
+			System.out.println("UP");
+			setPosition(getX(), getY()+(wall.getBoundingRectangle().y+wall.getBoundingRectangle().height-bounds.y));
+		}
+		if (bounds.x+bounds.width <= (wall.getBoundingRectangle().x+max)) {
+			System.out.println("LEFT");
+			setPosition(getX()-(bounds.x+bounds.width-wall.getBoundingRectangle().x), getY());
+		}
+		if (bounds.x >= (wall.getBoundingRectangle().x+wall.getBoundingRectangle().width-max)) {
+			System.out.println("RIGHT");
+			setPosition(getX()+(wall.getBoundingRectangle().x+wall.getBoundingRectangle().width-bounds.x), getY());
+		}
+	}
+	
+	public void collisionDoor() {
+		Array<Door> doors = Surface.pack.getDoors();
+		boolean flag = false;
+		if (doors != null)
+		for (int i = 0; i < doors.size; i++) {
+			Door door = doors.get(i);
+		if (door.getBoundingRectangle().overlaps(bounds)) {
+			if (((getColor().r*1000000+getColor().g*1000+getColor().b) ==
+				(door.getColor().r*1000000+door.getColor().g*1000+door.getColor().b)))
+			//flag = true;
+				doors.removeValue(door, false);
+			else
+				wallForce(door);
+			//System.out.println((getColor().r*1000000+getColor().g*1000+getColor().b));
+			//System.out.println((door.getColor().r*1000000+door.getColor().g*1000+door.getColor().b));
+		} 
+		}
+		if (flag) {
+			color.set(1.f, 0.f, 0.f, 1.f);
+			setColor(color);
+		}
+		else
+			setColor(new Color(1.f, 1.f, 1.f, 1.f));
+	}
+	
+	public void collisionWall() {
+		Array<Wall> walls = Surface.pack.getWalls();
+		if (walls != null)
+		for (int i = 0; i < Surface.pack.getWalls().size; i++)
+		if (walls.get(i).getBoundingRectangle().overlaps(bounds)) {
+			//color.set(1.f, 0.f, 0.f, 0.f);
+			wallForce(walls.get(i));
+		}
+	}
+	
+	public void collisionCheckPoint() {
+		Array<CheckPoint> checkPoints = Surface.pack.getCheckPoints();
+		if (checkPoints != null)
+		for (CheckPoint checkPoint:checkPoints)
+		if (checkPoint.getBoundingRectangle().overlaps(bounds)) {
+			this.checkPoint.set(checkPoint.getX(), checkPoint.getY());
+			this.checkPointCharge = 3;
+		}
+	}
+	
+	public void collisionSurface() {
+		Array<SurfaceX> surfaces = Surface.pack.getSurface();
+		fall = true;
+		if (surfaces != null)
+		for (SurfaceX surface: surfaces)
+		if (surface.getBoundingRectangle().overlaps(bounds)) {
+			if (fall)
+				setSize(getTexture().getWidth(), getTexture().getHeight());
+			fall = false;
+			break;
+		}
+	}
+	
+	public void collision() {
+		collisionSurface();
+		collisionWall();
+		collisionDoor();
+		collisionCheckPoint();
+	}
+	
 	public void update(float delta) {
 		draw(delta);
 		//bounds.setPosition(getX()+getWidth()/2, getY()+getHeight()/2);
 		//bounds.setRadius(getRegionWidth()/2-getHeight()/2/8);
 		bounds.setPosition(getX()+bounds.width/9f*1.3f, getY()+bounds.height/9f*1.3f);
 		inputHandler(delta);
-		int max = 20;
-		Array<Wall> walls = Surface.pack.getWalls();
-		if (walls != null)
-		for (int i = 0; i < Surface.pack.getWalls().size; i++)
-		if (walls.get(i).getBoundingRectangle().overlaps(bounds)) {
-			color.set(1.f, 0.f, 0.f, 0.f);
-			speedX = 0;
-			speedY = 0;
-			if (bounds.y+bounds.height <= (walls.get(i).getBoundingRectangle().y+max)) {
-				System.out.println("DOWN");
-				setPosition(getX(), getY()-(bounds.y+bounds.height-walls.get(i).getBoundingRectangle().y));
-			}
-			if (bounds.y >= (walls.get(i).getBoundingRectangle().y+walls.get(i).getBoundingRectangle().height-max)) {
-				System.out.println("UP");
-				setPosition(getX(), getY()+(walls.get(i).getBoundingRectangle().y+walls.get(i).getBoundingRectangle().height-bounds.y));
-			}
-			if (bounds.x+bounds.width <= (walls.get(i).getBoundingRectangle().x+max)) {
-				System.out.println("LEFT");
-				setPosition(getX()-(bounds.x+bounds.width-walls.get(i).getBoundingRectangle().x), getY());
-			}
-			if (bounds.x >= (walls.get(i).getBoundingRectangle().x+walls.get(i).getBoundingRectangle().width-max)) {
-				System.out.println("RIGHT");
-				setPosition(getX()+(walls.get(i).getBoundingRectangle().x+walls.get(i).getBoundingRectangle().width-bounds.x), getY());
-			}
-		} else
-			color.set(1.f, 1.f, 1.f, 0.f);
+		
+		collision();
+		
 		if (rot < 360)
 		rot+=delta*50;
 		else rot = 0;
 		this.rotate(delta*50);
+		
+		fall(delta);
 	}
 
 	private void inputHandler(float delta) {
@@ -104,6 +196,7 @@ public class Player extends RMESprite implements Json.Serializable {
 		sX = jsonData.getFloat("x");
 		sY = jsonData.getFloat("y");
 		super.read(json, jsonData);
+		checkPoint.set(sX, sY);
 
 	}
 

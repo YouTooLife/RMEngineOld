@@ -1,6 +1,7 @@
 package net.youtoolife.tools.models;
 
 import net.youtoolife.tools.handlers.RMESprite;
+import net.youtoolife.tools.screens.Surface;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
@@ -10,6 +11,9 @@ import com.badlogic.gdx.utils.JsonValue;
 public class ObjectX extends RMESprite implements Json.Serializable {
 	
 	public Rectangle bounds;
+	private int cl = 0;
+	private boolean rect = false, draw = false;
+	private int hp = 1000;
 	
 	public ObjectX() {
 		 super();
@@ -18,7 +22,11 @@ public class ObjectX extends RMESprite implements Json.Serializable {
 	
 	public ObjectX(Texture ws, float x, float y) {
 		super(ws, x, y);
+		this.setDraw(draw);
+		this.setRect(rect);
 		bounds = new Rectangle(x, y, 128, 128);
+		setSize(128, 128);
+		setColor(Surface.currentColor);
 	}
 	
 	public ObjectX(Texture ws, int frame_cols, int frame_rows, int animStart, int animStop, boolean animActive, float animSpeed) {
@@ -32,13 +40,35 @@ public class ObjectX extends RMESprite implements Json.Serializable {
 	
 	@Override
 	public void write(Json json) {
-		//json.writeValue("hp", hp);
+		json.writeValue("hp", hp);
+		json.writeValue("ctype", cl);
+		json.writeValue("drect", isRect());
+		json.writeValue("draw", isDraw());
 		super.write(json);
 	}
 
 	@Override
 	public void read(Json json, JsonValue jsonData) {
-		//hp = jsonData.getInt("hp");
+		hp = jsonData.getInt("hp");
+		cl = jsonData.getInt("ctype");
+		setRect(jsonData.getBoolean("drect"));
+		setDraw(jsonData.getBoolean("draw"));
 		super.read(json, jsonData);
+	}
+	
+	public boolean isDraw() {
+		return draw;
+	}
+
+	public void setDraw(boolean draw) {
+		this.draw = draw;
+	}
+	
+	public boolean isRect() {
+		return rect;
+	}
+
+	public void setRect(boolean rect) {
+		this.rect = rect;
 	}
 }
