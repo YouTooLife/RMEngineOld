@@ -1,8 +1,10 @@
 package net.youtoolife.tools.handlers;
 
+import net.youtoolife.tools.models.Background;
 import net.youtoolife.tools.models.CheckPoint;
 import net.youtoolife.tools.models.Door;
 import net.youtoolife.tools.models.ObjectX;
+import net.youtoolife.tools.models.Opponent;
 import net.youtoolife.tools.models.Player;
 import net.youtoolife.tools.models.SurfaceX;
 import net.youtoolife.tools.models.Wall;
@@ -21,6 +23,8 @@ public class RMEPack implements Json.Serializable {
 	private Array<Door> doors;
 	private Array<CheckPoint> checkPoints;
 	private Array<ObjectX> objects;
+	private Array<Opponent> opps;
+	private Background background = new Background();
 	
 	private boolean game = false;
 	
@@ -65,6 +69,10 @@ public class RMEPack implements Json.Serializable {
 			for (CheckPoint sur:checkPoints)
 				if (sur.getBoundingRectangle().contains(x+128/2, y+128/2))
 					checkPoints.removeValue(sur, false);
+		if (opps != null)
+			for (Opponent sur:opps)
+				if (sur.getBoundingRectangle().contains(x+128/2, y+128/2))
+					opps.removeValue(sur, false);
 		
 		
 	}
@@ -98,6 +106,12 @@ public class RMEPack implements Json.Serializable {
 			setObjects(new Array<ObjectX>());
 		getObjects().add(object);
 	}
+	
+	public void addOpponent(Opponent opponent) {
+		if (getOpps() == null)
+			setOpps(new Array<Opponent>());
+		getOpps().add(opponent);
+	}
 
 
 	@Override
@@ -108,6 +122,7 @@ public class RMEPack implements Json.Serializable {
 		json.writeValue("checkPoints", checkPoints);
 		json.writeValue("objects", objects);
 		json.writeValue("player", player);
+		json.writeValue("opponents", opps);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -119,6 +134,7 @@ public class RMEPack implements Json.Serializable {
 		checkPoints = json.readValue("checkPoints", Array.class, jsonData);
 		objects = json.readValue("objects", Array.class, jsonData);
 		player = json.readValue("player", Player.class, jsonData);
+		opps = json.readValue("opponents", Array.class, jsonData);
 	}
 	
 	public void update (float delta) {
@@ -141,6 +157,11 @@ public class RMEPack implements Json.Serializable {
 		if (player != null)
 			if (isGame())
 			player.update(delta);
+		
+		if (getOpps() != null)
+			for (Opponent sur:getOpps())
+				if (isGame())
+				sur.update(delta);
 	}
 	
 	public void draw(SpriteBatch batcher) {
@@ -167,6 +188,12 @@ public class RMEPack implements Json.Serializable {
 
 		if (player != null)
 			player.draw(batcher);
+		
+		///
+		if (opps != null)
+			for (Opponent sur:opps)
+				if (!sur.isDraw())
+				sur.draw(batcher);
 	}
 	
 	public void drawShape(ShapeRenderer shapeRenderer) {
@@ -204,6 +231,14 @@ public class RMEPack implements Json.Serializable {
 			}
 		if (getCheckPoints() != null)
 			for (CheckPoint sur:getCheckPoints())
+			{
+				if (sur.isDraw()) {
+					shapeRenderer.setColor(sur.getColor());
+				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
+				}
+			}
+		if (getOpps() != null)
+			for (Opponent sur:getOpps())
 			{
 				if (sur.isDraw()) {
 					shapeRenderer.setColor(sur.getColor());
@@ -249,6 +284,17 @@ public class RMEPack implements Json.Serializable {
 				if (sur.isRect())
 				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
 			}
+		if (getOpps() != null)
+			for (Opponent sur:getOpps())
+			{
+				//shapeRenderer.setColor(sur.getColor());
+				if (sur.isRect())
+				shapeRenderer.rect(sur.getX(), sur.getY(), sur.getWidth(), sur.getHeight());
+			}
+	}
+	
+	public void drawBackground(SpriteBatch batcher) {
+		background.draw(batcher);
 	}
 
 	public Array<Wall> getWalls() {
@@ -269,9 +315,17 @@ public class RMEPack implements Json.Serializable {
 	public Array<SurfaceX> getSurface() {
 		return surface;
 	}
+	
+	public Array<Opponent> getOpps() {
+		return opps;
+	}
 
 	public void setWalls(Array<Wall> walls) {
 		this.walls = walls;
+	}
+	
+	public void setOpps(Array<Opponent> opps) {
+		this.opps = opps;
 	}
 	
 	public void setDoors(Array<Door> doors) {

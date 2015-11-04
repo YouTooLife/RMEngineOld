@@ -7,6 +7,7 @@ import net.youtoolife.tools.handlers.RMEPack;
 import net.youtoolife.tools.models.CheckPoint;
 import net.youtoolife.tools.models.Door;
 import net.youtoolife.tools.models.ObjectX;
+import net.youtoolife.tools.models.Opponent;
 import net.youtoolife.tools.models.Player;
 import net.youtoolife.tools.models.SurfaceX;
 import net.youtoolife.tools.models.Wall;
@@ -36,10 +37,10 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 public class Surface extends ScreenAdapter {
 	
-	float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
+	public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
 	
 	RMEBuilder game;
-	OrthographicCamera guiCam;
+	public static OrthographicCamera guiCam = new OrthographicCamera(width, height); 
 	
 	ShapeRenderer shapeRenderer = new ShapeRenderer();
 	
@@ -81,7 +82,7 @@ public class Surface extends ScreenAdapter {
 	public Surface (RMEBuilder game) {
 		this.game = game;
 		
-		guiCam = new OrthographicCamera(width, height);
+		
 		guiCam.position.set(width / 2, height / 2, 0);
 		
 		Gdx.input.setInputProcessor(new InputProcessor() {
@@ -397,6 +398,13 @@ public class Surface extends ScreenAdapter {
 					//			rect.getX()+128*i, rect.getY()+128*j, drawRect));
 					}
 						
+					if (pack.getPlayer() != null)
+					if (currentType.equalsIgnoreCase("Opponent")) {
+							//	if (!drawShape)
+								pack.addOpponent(new Opponent(Assets.getTexture(currentType+"/"+currentImg), 
+										rect.getX()+128*i, rect.getY()+128*j, drawShape, drawRect));
+					}
+						
 					if (currentType.equalsIgnoreCase("Player")) 
 						pack.setPlayer(new Player(Assets.getTexture(currentType+"/"+currentImg), rect.getX()+128*i, rect.getY()+128*j));
 				
@@ -576,7 +584,7 @@ public class Surface extends ScreenAdapter {
 		
 		game.batcher.disableBlending();
 		game.batcher.begin();
-		
+		pack.drawBackground(game.batcher);
 		game.batcher.end();
 		
 		

@@ -95,7 +95,6 @@ public class Player extends RMESprite implements Json.Serializable {
 	
 	public void collisionDoor() {
 		Array<Door> doors = Surface.pack.getDoors();
-		boolean flag = false;
 		if (doors != null)
 		for (int i = 0; i < doors.size; i++) {
 			Door door = doors.get(i);
@@ -110,12 +109,6 @@ public class Player extends RMESprite implements Json.Serializable {
 			//System.out.println((door.getColor().r*1000000+door.getColor().g*1000+door.getColor().b));
 		} 
 		}
-		if (flag) {
-			color.set(1.f, 0.f, 0.f, 1.f);
-			setColor(color);
-		}
-		else
-			setColor(new Color(1.f, 1.f, 1.f, 1.f));
 	}
 	
 	public void collisionWall() {
@@ -151,11 +144,22 @@ public class Player extends RMESprite implements Json.Serializable {
 		}
 	}
 	
+	public void collisionObject() {
+		Array<ObjectX> objs = Surface.pack.getObjects();
+		if (objs != null)
+		for (ObjectX object: objs)
+		if (object.getBoundingRectangle().overlaps(bounds)) {
+			setColor(object.getColor());
+			objs.removeValue(object, false);
+		}
+	}
+	
 	public void collision() {
 		collisionSurface();
 		collisionWall();
 		collisionDoor();
 		collisionCheckPoint();
+		collisionObject();
 	}
 	
 	public void update(float delta) {
@@ -181,6 +185,10 @@ public class Player extends RMESprite implements Json.Serializable {
 		if (Gdx.input.isKeyPressed(Keys.UP) && speedY < 7) speedY += delta*10;
 		if (Gdx.input.isKeyPressed(Keys.DOWN) && speedY > -7) speedY -= delta*10;
 		setPosition(getX()+speedX, getY()+speedY);
+		if (speedX > 0) speedX-=delta;
+		if (speedX < 0) speedX+=delta;
+		if (speedY > 0) speedY-=delta;
+		if (speedY < 0) speedY+=delta;
 	}
 	
 	@Override
