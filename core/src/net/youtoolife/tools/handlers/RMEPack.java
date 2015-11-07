@@ -1,6 +1,7 @@
 package net.youtoolife.tools.handlers;
 
 import net.youtoolife.tools.models.Background;
+import net.youtoolife.tools.models.Bullet;
 import net.youtoolife.tools.models.CheckPoint;
 import net.youtoolife.tools.models.Door;
 import net.youtoolife.tools.models.ObjectX;
@@ -24,6 +25,9 @@ public class RMEPack implements Json.Serializable {
 	private Array<CheckPoint> checkPoints;
 	private Array<ObjectX> objects;
 	private Array<Opponent> opps;
+	private Array<Bullet> pBullets;
+	private Array<Opponent> remOpps = new Array<Opponent>();
+	private Array<Wall> remWalls = new Array<Wall>();
 	private Background background = new Background();
 	
 	private boolean game = false;
@@ -75,6 +79,12 @@ public class RMEPack implements Json.Serializable {
 					opps.removeValue(sur, false);
 		
 		
+	}
+	
+	public void addBullet(Bullet sur) {
+		if (pBullets == null)
+			pBullets = new Array<Bullet>();
+		pBullets.add(sur);
 	}
 	
 	public void addSurface(SurfaceX sur) {
@@ -162,6 +172,12 @@ public class RMEPack implements Json.Serializable {
 			for (Opponent sur:getOpps())
 				if (isGame())
 				sur.update(delta);
+		if (pBullets != null)
+			for (Bullet sur:pBullets)
+				if (isGame())
+				sur.update(delta);
+		
+		removeFromWorld();
 	}
 	
 	public void draw(SpriteBatch batcher) {
@@ -186,13 +202,18 @@ public class RMEPack implements Json.Serializable {
 				if (!sur.isDraw())
 				sur.draw(batcher);
 
-		if (player != null)
+		if (player != null) {
 			player.draw(batcher);
+			player.drawCircle(batcher);
+		}
 		
 		///
 		if (opps != null)
 			for (Opponent sur:opps)
 				if (!sur.isDraw())
+				sur.draw(batcher);
+		if (pBullets != null)
+			for (Bullet sur:pBullets)
 				sur.draw(batcher);
 	}
 	
@@ -296,6 +317,23 @@ public class RMEPack implements Json.Serializable {
 	public void drawBackground(SpriteBatch batcher) {
 		background.draw(batcher);
 	}
+	
+	public void removeFromWorld() {
+		for (Opponent opp:remOpps) {
+			opps.removeValue(opp, false);
+		}
+		for (Wall opp:remWalls) {
+			walls.removeValue(opp, false);
+		}
+	}
+	
+	public void removeOpp(Opponent opp) {
+		remOpps.add(opp);
+	}
+	public void removeWall(Wall wall) {
+		remWalls.add(wall);
+	}
+	
 
 	public Array<Wall> getWalls() {
 		return walls;
@@ -318,6 +356,10 @@ public class RMEPack implements Json.Serializable {
 	
 	public Array<Opponent> getOpps() {
 		return opps;
+	}
+	
+	public Array<Bullet> getPBullet() {
+		return pBullets;
 	}
 
 	public void setWalls(Array<Wall> walls) {

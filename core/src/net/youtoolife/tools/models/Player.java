@@ -1,6 +1,7 @@
 package net.youtoolife.tools.models;
 
 
+import net.youtoolife.tools.Assets;
 import net.youtoolife.tools.handlers.RMEPack;
 import net.youtoolife.tools.handlers.RMESprite;
 import net.youtoolife.tools.screens.Surface;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -24,11 +26,15 @@ public class Player extends RMESprite implements Json.Serializable {
 	 public float rot = 0;
 	 
 	 public Color color = new Color(1.f, 0.f, 0.f, 1.f);
+	 public RMESprite circle = new RMESprite(Assets.getTexture("Player/neba"), 0, 0);
 	 
-	 private int hp = 100;
+	 public int hp = 100;
 	 private float sX, sY;
 	 private Vector2 checkPoint = new Vector2();
 	 private int checkPointCharge = 3;
+	 
+	 boolean fire = false;
+	 float charge = 3.f;
 	 
 	 private boolean fall = false;
 	 
@@ -66,6 +72,8 @@ public class Player extends RMESprite implements Json.Serializable {
 		
 		if (checkPointCharge > 0) {
 			setPosition(checkPoint.x, checkPoint.y);
+			hp = 100;
+			setAlpha(1.f);
 			checkPointCharge--;
 		}
 		
@@ -163,7 +171,8 @@ public class Player extends RMESprite implements Json.Serializable {
 		if (objs != null)
 		for (ObjectX object: objs)
 		if (object.getBoundingRectangle().overlaps(bounds)) {
-			setColor(object.getColor());
+			//setColor(object.getColor());
+			setColorP(object.getColor());
 			objs.removeValue(object, false);
 		}
 	}
@@ -177,8 +186,18 @@ public class Player extends RMESprite implements Json.Serializable {
 		collisionOpponent();
 	}
 	
+	public void drawCircle(SpriteBatch batcher) {
+		circle.draw(batcher);
+	}
+	
+	public void setColorP(Color cl) {
+		setColor(cl);
+		circle.setColor(cl);
+	}
+	
 	public void update(float delta) {
 		draw(delta);
+		circle.setPosition(getX()+getWidth()/2-circle.getWidth()/2, getY()+getHeight()/2-circle.getHeight()/2);
 		//bounds.setPosition(getX()+getWidth()/2, getY()+getHeight()/2);
 		//bounds.setRadius(getRegionWidth()/2-getHeight()/2/8);
 		bounds.setPosition(getX()+bounds.width/9f*1.3f, getY()+bounds.height/9f*1.3f);
@@ -187,8 +206,17 @@ public class Player extends RMESprite implements Json.Serializable {
 		collision();
 		
 		if (rot < 360)
-		rot+=delta*50;
+		rot+=delta*200;
 		else rot = 0;
+		circle.setRotation(rot-45);
+		Color cl = circle.getColor();
+		if (charge < 5) {
+			charge+=delta;
+			if (charge >= 5)
+				charge = 5;
+		}
+		if (cl.a < 1)
+			circle.setColor(new Color(cl.r, cl.g, cl.b, 1/5.f*charge));
 		//this.rotate(delta*50);
 		//if (Math.abs(speedX)>3)
 		//	this.rotate(delta*-speedX*35);
@@ -228,7 +256,7 @@ public class Player extends RMESprite implements Json.Serializable {
 			if (getRotation() > -45)
 				rotate(-50*delta);
 			if (getRotation() < -45)
-				rotate(50*delta);
+				rotate(50*delta); 
 		}
 		if (speedX < 1 && speedX < 1) { 
 			if (getRotation() > (90+45))
@@ -244,6 +272,8 @@ public class Player extends RMESprite implements Json.Serializable {
 		}*/
 		
 		fall(delta);
+		if (hp <= 0)
+			goToCheckPoint();
 	}
 
 	private void inputHandler(float delta) {
@@ -256,6 +286,19 @@ public class Player extends RMESprite implements Json.Serializable {
 		if (speedX < 0) speedX+=delta;
 		if (speedY > 0) speedY-=delta;
 		if (speedY < 0) speedY+=delta;
+		
+		if (!fire&Gdx.input.isKeyPressed(Keys.SPACE)){
+			fire = true;
+			
+			float x = (float) (128*Math.cos((rot+90)*Math.PI/180));
+			float y = (float) (128*Math.sin((rot+90)*Math.PI/180));
+			Surface.pack.addBullet(new Bullet(Assets.getTexture("Player/neb"), getX()+x, getY()+y, rot, circle.getColor()));
+			//circle.setColor(new Color(cl.r, cl.g, cl.b, 0));
+			charge = 0;
+		}
+		if (fire&!Gdx.input.isKeyPressed(Keys.SPACE)){
+			fire = false;
+		}
 	}
 	
 	@Override
@@ -273,6 +316,10 @@ public class Player extends RMESprite implements Json.Serializable {
 		super.read(json, jsonData);
 		checkPoint.set(sX, sY);
 
+	}
+	
+	public float getCharge() {
+		return charge;
 	}
 
 }

@@ -1,6 +1,7 @@
 package net.youtoolife.tools.models;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 import net.youtoolife.tools.screens.Surface;
 
@@ -9,9 +10,23 @@ public class AngryStar extends OpponentCore {
 	boolean load = false;
 	float animSpeed = 0.05f;
 	int way = 0;
+	float time = 2;
+	float force = 10;
 	
 	public AngryStar(Opponent opponent) {
 		super(opponent);
+	}
+	
+	public void collisionPlayer() {
+		Player player = Surface.pack.getPlayer();
+		if (player != null)
+			if (player.getBoundingRectangle().overlaps(getOpp().getBoundingRectangle())) {
+				if (time == 2) {
+					player.hp -= force;
+					player.setAlpha(1/100.f*player.hp);
+					time = 0;
+				}
+		}
 	}
 
 	
@@ -19,6 +34,12 @@ public class AngryStar extends OpponentCore {
 	public int core(float delta) {
 		super.core(delta);
 		
+		if (time < 2) {
+			time+=delta;
+			if (time > 2)
+				time = 2;
+		}
+		collisionPlayer();
 		Opponent opp = getOpp();
 		if (!load) {
 			opp.setRegion(0, 0, 128, 128);
@@ -27,6 +48,7 @@ public class AngryStar extends OpponentCore {
 			opp.setAnimation(getOpp().getTexture(), 3, 1, 0, 0, 0.3f, false);
 			//opp.setAnimation(getOpp().getTexture(), 3, 1, 0, 2, animSpeed, true);
 			load = true;
+			getOpp().hp = 150;
 		}
 		if (way != getWay()) {
 			way = getWay();

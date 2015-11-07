@@ -36,6 +36,8 @@ public class Wall extends RMESprite implements Json.Serializable {
 	public void update(float delta) {
 		draw(delta);
 		bounds.setPosition(getX()+bounds.width, getY()+bounds.height);
+		if (hp <= 0)
+		Surface.pack.removeWall(this);
 	}
 	
 	@Override
@@ -70,5 +72,13 @@ public class Wall extends RMESprite implements Json.Serializable {
 
 	public void setRect(boolean rect) {
 		this.rect = rect;
+	}
+	
+	public void addHP(float hp) {
+		this.hp += hp;
+	}
+	
+	public int getHP() {
+		return hp;
 	}
 }

@@ -13,7 +13,7 @@ public class Opponent extends RMESprite implements Json.Serializable {
 	public Rectangle bounds = new Rectangle(0,0, 128, 128);
 	private int cl = 0;
 	private boolean rect = false, draw = false;
-	private int hp = 1000;
+	public int hp = 100;
 	float speedX = 0.f, speedY = 0.f;
 	private OpponentCore oppCore = new AngryStar(this);
 	
@@ -39,6 +39,8 @@ public class Opponent extends RMESprite implements Json.Serializable {
 		draw(delta);
 		bounds.setPosition(getX()+bounds.width, getY()+bounds.height);
 		oppCore.core(delta);
+		if (hp <= 0)
+		Surface.pack.removeOpp(this);
 	}
 	
 	@Override
