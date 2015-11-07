@@ -9,60 +9,260 @@ import net.youtoolife.tools.screens.Surface;
 public class OpponentCore {
 	
 	private Opponent opp;
-	int speed = 250;
-	// float speedX = 0.f, speedY = 0.f;
-	//Circle bounds;
-	 public Rectangle bounds;
+	
+	float speedX = 70, speedY = 70;
+	
+	boolean goCenter = false;
+	boolean goTolim = false, center = false;
+	
+	int limX;
+	int limY;
+	boolean limXX, limYY;
+	
+	public Rectangle bounds;
+	
+	public int way = 0, oldWay = 1;
 	
 	public OpponentCore(Opponent opponent) {
 		this.opp = opponent;
 	}
 	
-	public void collisionWall() {
-		Array<Wall> walls = Surface.pack.getWalls();
-		if (walls != null)
-		for (int i = 0; i < Surface.pack.getWalls().size; i++)
-		if (walls.get(i).getBoundingRectangle().overlaps(bounds)) {
-			//color.set(1.f, 0.f, 0.f, 0.f);
-			wallForce(walls.get(i));
-		}
+	public boolean isWall(float x, float y) {
+		if (Surface.pack.getWalls() != null)
+		for (Wall wall: Surface.pack.getWalls())
+			if (wall.getX() == x && wall.getY() == y)
+				return true;
+		return false;
 	}
 	
-	public void wallForce(RMESprite wall) {
-		getOpp().speedX = 0;
-		getOpp().speedY = 0;
-		int max = 20;
-		if (bounds.y+bounds.height <= (wall.getBoundingRectangle().y+max)) {
-			System.out.println("DOWN");
-			getOpp().setPosition(getOpp().getX(), getOpp().getY()-(bounds.y+bounds.height-wall.getBoundingRectangle().y));
-		}
-		if (bounds.y >= (wall.getBoundingRectangle().y+wall.getBoundingRectangle().height-max)) {
-			System.out.println("UP");
-			getOpp().setPosition(getOpp().getX(), getOpp().getY()+(wall.getBoundingRectangle().y+wall.getBoundingRectangle().height-bounds.y));
-		}
-		if (bounds.x+bounds.width <= (wall.getBoundingRectangle().x+max)) {
-			System.out.println("LEFT");
-			getOpp().setPosition(getOpp().getX()-(bounds.x+bounds.width-wall.getBoundingRectangle().x), getOpp().getY());
-		}
-		if (bounds.x >= (wall.getBoundingRectangle().x+wall.getBoundingRectangle().width-max)) {
-			System.out.println("RIGHT");
-			getOpp().setPosition(getOpp().getX()+(wall.getBoundingRectangle().x+wall.getBoundingRectangle().width-bounds.x), getOpp().getY());
-		}
+	public boolean isOpponent(float x, float y) {
+		if (Surface.pack.getOpps() != null)
+			for (int i = 0; i < Surface.pack.getOpps().size; i++)
+			{
+				Opponent opp = Surface.pack.getOpps().get(i);
+				Rectangle bounds = new Rectangle(x, y, 128, 128);
+				if (opp != getOpp() && opp.getBoundingRectangle().overlaps(bounds))
+						return true;
+			}
+		/*for (Opponent opp: Surface.pack.getOpps())
+			if (/*opp != getOpp() && opp.getX() == x && opp.getY() == y)
+				return true;*/
+		return false;
 	}
 	
-	public void collision() {
-		bounds = getOpp().bounds;
-		collisionWall();
+	public boolean isPlayer(float x, float y) {
+		Player player = Surface.pack.getPlayer();
+		if (player != null) {
+			
+				Rectangle bounds = new Rectangle(x, y, 128, 128);
+				if (player.getBoundingRectangle().overlaps(bounds))
+						return true;
+			}
+		return false;
 	}
 	
+	public boolean isSurface(float x, float y) {
+		if (Surface.pack.getSurface() != null)
+		for (SurfaceX opp: Surface.pack.getSurface())
+			if (opp.getX() == x && opp.getY() == y)
+				return true;
+		return false;
+	}
+	
+	public boolean canGo(float x, float y) {
+		if (!isWall(x, y)&&!isOpponent(x, y)&&isSurface(x, y)&&!isPlayer(x, y))
+			return true;
+		else
+			return false;
+	}
+	
+	public int go(float delta) {
+		if (!limXX) {
+			if (limX == getOpp().getX()) {
+				limXX = true;
+				return 1;
+			}
+		if (limX > getOpp().getX()) {
+			//System.out.println("~x"+getOpp().getX()+"/"+limX);
+			way = 4;
+			getOpp().setPosition(getOpp().getX()+speedX*delta, getOpp().getY());
+			if (limX <= getOpp().getX()){
+				//System.out.println("x"+getOpp().getX()+"/"+limX);
+				limXX = true;
+				return 1;
+			}
+		}
+		
+		if (limX < getOpp().getX()) {
+			//System.out.println("~-x"+getOpp().getX()+"/"+limX);
+			way = 2;
+			getOpp().setPosition(getOpp().getX()-speedX*delta, getOpp().getY());
+			if (limX >= getOpp().getX()){
+				//System.out.println("x"+getOpp().getX()+"/"+limX);
+				limXX = true;
+				return 1;
+			}
+		}
+		}
+		if (!limYY && limXX) {
+			
+			if (limY == getOpp().getY()) {
+				limYY = true;
+				return 2;
+			}
+		if (limY > getOpp().getY()) {
+			//System.out.println("y");
+			way = 1;
+			getOpp().setPosition(getOpp().getX(), getOpp().getY()+speedY*delta);
+			//return 1;
+			if (limY <= getOpp().getY()){
+				//System.out.println("+y"+getOpp().getY()+"/"+limY);
+				limYY = true;
+				return 2;
+			}
+		}
+		
+		if (limY < getOpp().getY()) {
+			//System.out.println("y-");
+			way = 3;
+			getOpp().setPosition(getOpp().getX(), getOpp().getY()-speedY*delta);
+			//return 1;
+			if (limY >= getOpp().getY()){
+				//System.out.println("-y"+getOpp().getY()+"/"+limY);
+				limYY = true;
+				return 2;
+			}
+		}
+		}
+		return 0;
+	}
+	
+	public int getLim() {
+		Player player = Surface.pack.getPlayer();
+		long px = (int)(player.getX()/128)*128;
+		long py = (int)(player.getY()/128)*128;
+		if (getOpp().getX() < px) {
+			if (canGo(getOpp().getX()+128, getOpp().getY())) {
+				limX = (int) (getOpp().getX()+128);
+				limY = (int) getOpp().getY();
+				//System.out.println(limX+":"+limY);
+				return 1;
+			}
+		}
+		if (getOpp().getX() > px) {
+			if (canGo(getOpp().getX()-128, getOpp().getY())) {
+				limX = (int) (getOpp().getX()-128);
+				limY = (int) getOpp().getY();
+				//System.out.println(limX+":"+limY);
+				return 1;
+			}
+		}
+		if (getOpp().getY() < py) {
+			if (canGo(getOpp().getX(), getOpp().getY()+128)) {
+				limX = (int) (getOpp().getX());
+				limY = (int) (getOpp().getY()+128);
+				//System.out.println(limX+":"+limY);
+				return 1;
+			}
+		}
+		if (getOpp().getY() > py) {
+			if (canGo(getOpp().getX(), getOpp().getY()-128)) {
+				limX = (int) (getOpp().getX());
+				limY = (int) (getOpp().getY()-128);
+				//System.out.println(limX+":"+limY);
+				return 1;
+			}
+		}
+		return 0;
+	}
 	
 	public int core(float delta) {
-		collision();
+		if (!center )
+		if (!goCenter && (getOpp().getX() % 128 != 0 || getOpp().getY() % 128 != 0)) {
+			limX = (int)(getOpp().getX()/128)*128;
+			limY = (int)(getOpp().getY() / 128)*128;
+			goCenter = true;
+		}
+		else {
+			goCenter = false;
+			center = true;
+		}
+		
+		if (goCenter && !center)
+			goCenter(delta);
+		
+		if (center) {
+			
+			if (!goTolim)
+			if (getLim() == 1) {
+				limXX = false;
+				limYY = false;
+				goTolim = true;
+			}
+			if (goTolim) {
+				int res = go(delta);
+				if (res == 1)
+						getOpp().setPosition(limX, getOpp().getY());
+				if (res == 2)
+					getOpp().setPosition(getOpp().getX(), limY);
+				
+				if (limXX && limYY) {
+					System.out.println("~lim");
+					goTolim = false;
+					oldWay = way;
+					way = 0;
+				}
+			}
+		}
+		return 0;
+	}
+	
+	public int goCenter(float delta) {
+		if (goCenter) {
+			if (getOpp().getX() % 128 != 0) {
+				
+				
+				//System.out.println(getOpp().getX()+" "+limX);
+				if (getOpp().getX() > limX) {
+					getOpp().setPosition(getOpp().getX()-speedX*delta, getOpp().getY());
+					return 1;
+				}
+				else {
+					if (getOpp().getX() < limX)
+						getOpp().setPosition(limX, getOpp().getY());
+					return 1;
+				}
+				
+			}
+			if (getOpp().getY() % 128 != 0) {
+				
+				if (getOpp().getY() > limY) {
+					getOpp().setPosition(getOpp().getX(), getOpp().getY()-speedY*delta);
+					return 1;
+				}
+				else {
+					if (getOpp().getY() < limY)
+						getOpp().setPosition(getOpp().getX(), limY);
+					goCenter = false;
+					center = true;
+					return 1;
+				}
+				
+			}
+		}
+		
 		return 0;
 	}
 	
 	public Opponent getOpp() {
 		return opp;
+	}
+	
+	public int getWay() {
+		return way;
+	}
+	public int getOldWay() {
+		return oldWay;
 	}
 
 }

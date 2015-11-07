@@ -36,7 +36,8 @@ public class RMESprite extends Sprite implements Json.Serializable {
     //private RMEParamStr param;
     
     public RMESprite(Texture texture, float x, float y) {
-    		super(texture, 0, 0, texture.getWidth(), texture.getHeight());
+    	super(texture, 0, 0, texture.getWidth(), texture.getHeight());
+    	//super(new TextureRegion(texture, 128, 128));
     		setX(x);
     		setY(y);
     		//bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
@@ -46,6 +47,9 @@ public class RMESprite extends Sprite implements Json.Serializable {
 	
 	public RMESprite(Texture ws, int frame_cols, int frame_rows, int animStart, int animStop, boolean animActive, float animSpeed) {
 		super(ws, 0, 0, ws.getWidth(), ws.getHeight());
+		//super(new TextureRegion(ws, ws.getWidth()/frame_cols, ws.getHeight()/frame_rows));
+		/*super(new TextureRegion.split(ws, ws.getWidth()/frame_cols
+				, ws.getHeight()/frame_rows)[0][0], 0, 0,0,0);*/
 		setAnimation(ws, frame_cols, frame_rows, animStart, animStop, animSpeed, animActive);
 		//bounds = new Rectangle(0, 0, ws.getWidth(), ws.getHeight());
 		//initParam(ws, 0, 0, frame_cols, frame_rows, animStart, animStop, animActive, animSpeed);
@@ -75,7 +79,8 @@ public class RMESprite extends Sprite implements Json.Serializable {
         stateTime = 0f;
         if (!animActive) 
         	setCurrentFrame(walkFrames[0]);
-        	setSize(walkFrames[0].getRegionWidth(), walkFrames[0].getRegionHeight());
+        setSize(walkFrames[0].getRegionWidth(), walkFrames[0].getRegionHeight());
+        //setSize(walkFrames[0].getRegionWidth(), walkFrames[0].getRegionHeight());
     }
 	
 	public void stopAnim() {
@@ -90,6 +95,7 @@ public class RMESprite extends Sprite implements Json.Serializable {
 	public void draw(float delta) {
 		if (isAnimActive()) updateAnim(delta);
 		setRegion(getCurrentFrame());
+		//setTexture(get);
 		//bounds.setSize(currentFrame.getRegionWidth(), currentFrame.getRegionHeight());
 		//bounds.setPosition(getX(), getY());
 	}
@@ -123,8 +129,11 @@ public class RMESprite extends Sprite implements Json.Serializable {
 		setTexture(Assets.getTexture(getTextureName()));
 		
 		setRegion(0, 0, getTexture().getWidth(), getTexture().getHeight());
+		//setRegion(0, 0, 128, 128);
 		setSize(Math.abs(getTexture().getWidth()), Math.abs(getTexture().getHeight()));
+		//setSize(Math.abs(128), Math.abs(128));
 		setOrigin(getTexture().getWidth() / 2, getTexture().getHeight()/ 2);
+		//setOrigin(128 / 2, 128/ 2);
 		
 		setCurrentFrame(new TextureRegion(getTexture()));
 		setPosition(jsonData.getFloat("x"), jsonData.getFloat("y"));
@@ -136,6 +145,8 @@ public class RMESprite extends Sprite implements Json.Serializable {
 		setAnimActive(jsonData.getBoolean("a"));
 		setAnimSpeed(jsonData.getFloat("AS"));
 		setColor(json.readValue("color", Color.class, jsonData));
+		if (animActive)
+			setAnimation(getTexture(), getFRAME_COLS(), getFRAME_COLS(), getAnimStart(), getAnimStop(), getAnimSpeed(), isAnimActive());
 	}
 
 	public int getFRAME_COLS() {

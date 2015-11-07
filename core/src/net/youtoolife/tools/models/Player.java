@@ -111,6 +111,20 @@ public class Player extends RMESprite implements Json.Serializable {
 		}
 	}
 	
+	public void collisionOpponent() {
+		Array<Opponent> doors = Surface.pack.getOpps();
+		if (doors != null)
+		for (int i = 0; i < doors.size; i++) {
+			Opponent door = doors.get(i);
+		if (door.getBoundingRectangle().overlaps(bounds)) {
+			
+				wallForce(door);
+			//System.out.println((getColor().r*1000000+getColor().g*1000+getColor().b));
+			//System.out.println((door.getColor().r*1000000+door.getColor().g*1000+door.getColor().b));
+			} 
+		}
+	}
+	
 	public void collisionWall() {
 		Array<Wall> walls = Surface.pack.getWalls();
 		if (walls != null)
@@ -160,6 +174,7 @@ public class Player extends RMESprite implements Json.Serializable {
 		collisionDoor();
 		collisionCheckPoint();
 		collisionObject();
+		collisionOpponent();
 	}
 	
 	public void update(float delta) {
@@ -174,7 +189,59 @@ public class Player extends RMESprite implements Json.Serializable {
 		if (rot < 360)
 		rot+=delta*50;
 		else rot = 0;
-		this.rotate(delta*50);
+		//this.rotate(delta*50);
+		//if (Math.abs(speedX)>3)
+		//	this.rotate(delta*-speedX*35);
+		//else
+		//	this.rotate(delta*-speedY*35);
+		/*if (speedX > 1 && Math.abs(speedY) < 1) {
+			if (getRotation() > -90)
+				rotate(-50*delta);
+			if (getRotation() < -90)
+				rotate(50*delta);
+		}
+		if (speedX < -1 && Math.abs(speedY) < 1) {
+			if (getRotation() < 90)
+				rotate(50*delta);
+			if (getRotation() > 90)
+				rotate(-50*delta);
+		}
+		if (speedY > 1 && Math.abs(speedX) < 1) { 
+			if (getRotation() > 0)
+				rotate(-50*delta);
+			if (getRotation() < 0)
+				rotate(50*delta);
+		}
+		if (speedY < -1 && Math.abs(speedX) < 1) { 
+			if (getRotation() > 180)
+				rotate(-50*delta);
+			if (getRotation() < 180)
+				rotate(50*delta);
+		}
+		if (speedX > 1 && speedX > 1) { 
+			if (getRotation() > -45)
+				rotate(-50*delta);
+			if (getRotation() < 45)
+				rotate(50*delta);
+		}
+		if (speedX < 1 && speedX > 1) { 
+			if (getRotation() > -45)
+				rotate(-50*delta);
+			if (getRotation() < -45)
+				rotate(50*delta);
+		}
+		if (speedX < 1 && speedX < 1) { 
+			if (getRotation() > (90+45))
+				rotate(-50*delta);
+			if (getRotation() < (90+45))
+				rotate(50*delta);
+		}
+		if (speedX > 1 && speedX < 1) { 
+			if (getRotation() > -(90+45))
+				rotate(-50*delta);
+			if (getRotation() < -(90+45))
+				rotate(50*delta);
+		}*/
 		
 		fall(delta);
 	}
