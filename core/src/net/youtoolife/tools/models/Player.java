@@ -35,6 +35,8 @@ public class Player extends RMESprite implements Json.Serializable {
 	 
 	 boolean fire = false;
 	 float charge = 3.f;
+	 float space = 30;
+	 boolean attack = false;
 	 
 	 private boolean fall = false;
 	 
@@ -187,6 +189,7 @@ public class Player extends RMESprite implements Json.Serializable {
 	}
 	
 	public void drawCircle(SpriteBatch batcher) {
+		if (attack)
 		circle.draw(batcher);
 	}
 	
@@ -205,9 +208,11 @@ public class Player extends RMESprite implements Json.Serializable {
 		
 		collision();
 		
+		if (attack) {
 		if (rot < 360)
 		rot+=delta*200;
 		else rot = 0;
+		
 		circle.setRotation(rot-45);
 		Color cl = circle.getColor();
 		if (charge < 5) {
@@ -217,6 +222,14 @@ public class Player extends RMESprite implements Json.Serializable {
 		}
 		if (cl.a < 1)
 			circle.setColor(new Color(cl.r, cl.g, cl.b, 1/5.f*charge));
+		}
+		
+		if (space < 30) {
+			space+=delta;
+			if (space >= 30) {
+				attack = false;
+			}
+		}
 		//this.rotate(delta*50);
 		//if (Math.abs(speedX)>3)
 		//	this.rotate(delta*-speedX*35);
@@ -290,11 +303,14 @@ public class Player extends RMESprite implements Json.Serializable {
 		if (!fire&Gdx.input.isKeyPressed(Keys.SPACE)){
 			fire = true;
 			
+			if (attack) {
 			float x = (float) (128*Math.cos((rot+90)*Math.PI/180));
 			float y = (float) (128*Math.sin((rot+90)*Math.PI/180));
 			Surface.pack.addBullet(new Bullet(Assets.getTexture("Player/neb"), getX()+x, getY()+y, rot, circle.getColor()));
+			}
 			//circle.setColor(new Color(cl.r, cl.g, cl.b, 0));
-			charge = 0;
+			charge = space = 0;
+			attack = true;
 		}
 		if (fire&!Gdx.input.isKeyPressed(Keys.SPACE)){
 			fire = false;

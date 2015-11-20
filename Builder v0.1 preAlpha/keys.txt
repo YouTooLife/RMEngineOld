@@ -1,0 +1,34 @@
+
+W-D-S-A or UP-RIGHT-DOWN-LEFT - to move
+HOLD SHIFT and (W-D-S-A or UP-RIGHT-DOWN-LEFT) - to speed move
+
+G - Debug/Build mode off/on
+X - Remove mode off/on
+Z - Draw mode off/on
+//B - DrawRect mode off/on
+
+E - next color (white/red/green/blue)
+Q - previous color
+
+0 - alpha--
+1 - alpha++
+3 - set alpha 1.f
+
+R - Respawn player
+
+P - Game pause off/on
+
+O - save lavel
+L - load level
+
+M - set SFX
+
+
+/*
+/////////
+0 - set white color
+1 - set red color
+2 - set green color
+3 - set blue color
+/////////
+*/

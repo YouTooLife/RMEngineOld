@@ -69,8 +69,20 @@ public class OpponentCore {
 		return false;
 	}
 	
+	public boolean isDoor(float x, float y) {
+		if (Surface.pack.getDoors() != null)
+		for (Door door: Surface.pack.getDoors())
+			if (door.getX() == x && door.getY() == y)
+				if (((getOpp().getColor().r*1000000
+						+getOpp().getColor().g*1000
+						+getOpp().getColor().b) !=
+				(door.getColor().r*1000000+door.getColor().g*1000+door.getColor().b)))
+				return true;
+		return false;
+	}
+	
 	public boolean canGo(float x, float y) {
-		if (!isWall(x, y)&&!isOpponent(x, y)&&isSurface(x, y)&&!isPlayer(x, y))
+		if (!isWall(x, y)&&!isOpponent(x, y)&&isSurface(x, y)&&!isPlayer(x, y)&&!isDoor(x, y))
 			return true;
 		else
 			return false;
@@ -176,6 +188,25 @@ public class OpponentCore {
 		return 0;
 	}
 	
+	public void collisionDoor() {
+		Array<Door> doors = Surface.pack.getDoors();
+		if (doors != null)
+		for (int i = 0; i < doors.size; i++) {
+			Door door = doors.get(i);
+		if (door.getBoundingRectangle().overlaps(getOpp().getBoundingRectangle())) {
+			if (((getOpp().getColor().r*1000000+
+					getOpp().getColor().g*1000+
+					getOpp().getColor().b) ==
+				(door.getColor().r*1000000+door.getColor().g*1000+door.getColor().b)))
+			//flag = true;
+				doors.removeValue(door, false);
+				//wallForce(door);
+			//System.out.println((getColor().r*1000000+getColor().g*1000+getColor().b));
+			//System.out.println((door.getColor().r*1000000+door.getColor().g*1000+door.getColor().b));
+		} 
+		}
+	}
+	
 	public int core(float delta) {
 		if (!center )
 		if (!goCenter && (getOpp().getX() % 128 != 0 || getOpp().getY() % 128 != 0)) {
@@ -207,13 +238,14 @@ public class OpponentCore {
 					getOpp().setPosition(getOpp().getX(), limY);
 				
 				if (limXX && limYY) {
-					System.out.println("~lim");
+					//System.out.println("~lim");
 					goTolim = false;
 					oldWay = way;
 					way = 0;
 				}
 			}
 		}
+		collisionDoor();
 		return 0;
 	}
 	

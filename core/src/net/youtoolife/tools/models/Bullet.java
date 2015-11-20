@@ -92,16 +92,32 @@ public class Bullet extends RMESprite {
 		for (int i = 0; i < doors.size; i++) {
 			Opponent door = doors.get(i);
 		if (door.getBoundingRectangle().overlaps(bounds)) {
+			float r = getColor().r*getColor().a/5.f+door.getColor().r;
+			if (r > 1.f)
+				r = 1;
+			float g = getColor().g*getColor().a/5.f+door.getColor().g;
+			if (g > 1.f)
+				g = 1;
+			float b = getColor().b*getColor().a/5.f+door.getColor().b;
+			if (b > 1.f)
+				b = 1;
+			System.out.println(r+" "+g+" "+b);
+			door.setColor(new Color(r, 
+					g, 
+					b, door.getColor().a));
+			
+			//Player p = Surface.pack.getPlayer();
+			if (getColor().r==1.f&&r==getColor().r||
+					getColor().g==1.f&&g==getColor().g||
+							getColor().b==1.f&&b==getColor().b) {
 			//System.out.println((getColor().r*1000000+getColor().g*1000+getColor().b));
 			//System.out.println((door.getColor().r*1000000+door.getColor().g*1000+door.getColor().b));
 			door.hp -=force*getColor().a;
-			door.setColor(new Color(getColor().r+door.getColor().r, 
-					getColor().g+door.getColor().g, 
-					getColor().b+door.getColor().b, 1.f));
 			door.setAlpha(1/1000.f*door.hp);
 			if (door.getColor().a < 0.1f)
 				door.setAlpha(0.1f);
-			System.out.println(door.hp);
+			
+			}
 			removeSelf();
 			} 
 		}

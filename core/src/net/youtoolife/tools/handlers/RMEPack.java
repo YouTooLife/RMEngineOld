@@ -29,6 +29,7 @@ public class RMEPack implements Json.Serializable {
 	private Array<Opponent> remOpps = new Array<Opponent>();
 	private Array<Wall> remWalls = new Array<Wall>();
 	private Background background = new Background();
+	public String sfx = "";
 	
 	private boolean game = false;
 	

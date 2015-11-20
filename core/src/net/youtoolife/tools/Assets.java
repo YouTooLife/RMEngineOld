@@ -18,6 +18,7 @@ public class Assets {
 	//public static String login = System.getProperty("user.name"), passWord = "toor";
 	
 	public static void load () {
+		if (RMEBuilder.bassMode)
 		RMESound.loadFiles("SFX/");
 		loadIntTextures("textures/");
 		loadTextures("textures/");

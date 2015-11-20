@@ -9,11 +9,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class RMEBuilder extends Game {
 	
 	public SpriteBatch batcher;
+	public static boolean bassMode = false;
 
 	@Override
 	public void create () {
 		batcher = new SpriteBatch();
 		
+		if (bassMode)
 		RMESound.initNativeBass();
 		Assets.load();
 		setScreen(new Surface(this));

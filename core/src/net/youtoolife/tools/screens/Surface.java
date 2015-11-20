@@ -231,6 +231,7 @@ public class Surface extends ScreenAdapter {
 				}
 				if (keycode == Keys.NUM_3) {
 					alpha = 1.f;
+					currentColor.a = alpha;
 				}
 				if (keycode == Keys.E) {
 					cl++;
@@ -244,6 +245,23 @@ public class Surface extends ScreenAdapter {
 						pack.setGame(true);
 					else
 						pack.setGame(false);
+				}
+				if (keycode == Keys.M) {
+					Gdx.input.getTextInput(new TextInputListener() {
+						
+						@Override
+						public void input(String text) {
+							pack.sfx = text;
+							
+							
+						}
+						
+						@Override
+						public void canceled() {
+							
+							
+						}
+					}, "File name:", "");
 				}
 				
 				if (keycode == Keys.O) {
