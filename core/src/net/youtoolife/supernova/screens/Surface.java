@@ -278,7 +278,7 @@ public class Surface extends ScreenAdapter {
 							
 							RMECrypt crypt = new RMECrypt();
 							String s = json.toJson(pack);
-							FileHandle filehandle = Gdx.files.local(text+".levelc");
+							FileHandle filehandle = Gdx.files.local(text+".level");
 							filehandle.writeBytes(crypt.encrypt(s, "YouTooLife1911"), false);
 							
 							

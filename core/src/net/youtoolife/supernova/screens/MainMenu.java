@@ -190,7 +190,7 @@ public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHe
 			
 			@Override
 			public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-				if (!touched && guiCam.zoom == 1.f) {
+				if (!touched && guiCam.zoom == 1.f && button == 0) {
 					upDateClick();
 					
 						for (Sprite sprite : types)
