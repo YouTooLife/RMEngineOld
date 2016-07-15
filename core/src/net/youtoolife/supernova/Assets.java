@@ -25,7 +25,7 @@ public class Assets {
 	}
 	
 	private static void loadIntTextures(String dir) {
-		field = new Texture(Gdx.files.internal(dir+"field.png"));
+		//field = new Texture(Gdx.files.internal(dir+"field.png"));
 	}
 	
 	private static void loadTextures(String dir) {
@@ -71,6 +71,7 @@ public class Assets {
 				Texture texture = new Texture(file);
 				textures.add(texture);
 				textureNames.add(s+"/"+file.nameWithoutExtension());
+				//
 			}
 		}
 	}

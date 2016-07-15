@@ -14,6 +14,5 @@ public class DesktopLauncher {
 		config.height = 768;
 		//config.fullscreen = true;
 		new LwjglApplication(new RMEBuilder(), config);
-		//
 	}
 }

@@ -65,7 +65,7 @@ public class Surface extends ScreenAdapter {
 	
 	public static RMEPack pack = new RMEPack();
 	
-	private BitmapFont dbgMsg = new BitmapFont(); 
+	private BitmapFont dbgMsg; 
 	
 	private Boolean guiTouch = false, 
 			del = false,
@@ -329,8 +329,10 @@ public class Surface extends ScreenAdapter {
 		createGui();
 		refreshTypes();
 		
-		dbgMsg.setColor(Color.PURPLE);
-		dbgMsg.setScale(1.5f);
+		dbgMsg = new BitmapFont(Gdx.files.local("HelveticaNeue.fnt"));
+		
+		//dbgMsg.setColor(Color.PURPLE);
+		//dbgMsg.setScale(1.5f);
 		delMsg.setColor(Color.RED);
 		delMsg.setScale(1.3f);
 	}
@@ -445,7 +447,7 @@ public class Surface extends ScreenAdapter {
 			int iy = 0;
 			for (int i = 0; i < files.length; i++) {
 				if (!files[i].name().contains(".")) {
-					Sprite sprite = new Sprite(Assets.field);
+					Sprite sprite = new Sprite(Assets.getTexture("field"));
 					System.out.println("1");
 					sprite.setSize(100, 20);
 					sprite.setPosition(10, height - 25 * iy - 150);
